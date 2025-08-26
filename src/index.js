@@ -47,15 +47,13 @@ const creacion = require("../routes/creacion");
 const especial = require("../routes/especial");
 
 const app = express();
-//app.use(cors());
-//app.use(cors({ origin: true }));
 app.use(
   cors({
     origin: [
-      "http://localhost:4200", // frontend local (Angular)
+      "http://localhost:4200",
       "https://proyecto-despertad-production.up.railway.app",
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })

@@ -17,7 +17,7 @@ const crearTablas = async () => {
       estado VARCHAR(50) NOT NULL
     );
 
-    -- Crea la tabla si no existe
+    -- TABLA DE CÓDIGOS/CONTRASEÑA
     CREATE TABLE IF NOT EXISTS reset_codes (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
@@ -43,7 +43,7 @@ const crearTablas = async () => {
       cod_est VARCHAR(10) UNIQUE NOT NULL
     );
 
-    -- TABLA DE INSCRIPCIONES (Registra en qué gestión y curso está el estudiante)
+    -- TABLA DE INSCRIPCIONES
     CREATE TABLE IF NOT EXISTS inscripciones (
       id SERIAL PRIMARY KEY,
       estudiante_id INT REFERENCES estudiantes(id) ON DELETE CASCADE,
@@ -56,7 +56,7 @@ const crearTablas = async () => {
       mes_fin INT CHECK (mes_fin BETWEEN 2 AND 11)
     );
 
-    -- TABLA DE ENCARGADOS (Responsables del estudiante)
+    -- TABLA DE ENCARGADOS
     CREATE TABLE IF NOT EXISTS encargados (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(100) NOT NULL,
@@ -68,7 +68,7 @@ const crearTablas = async () => {
       genero VARCHAR(20)
     );
 
-    -- TABLA INTERMEDIA ENTRE ESTUDIANTES Y ENCARGADOS (Asigna responsables con parentesco)
+    -- TABLA INTERMEDIA ENTRE ESTUDIANTES Y ENCARGADOS
     CREATE TABLE IF NOT EXISTS estudiantes_encargados (
       estudiante_id INT REFERENCES estudiantes(id) ON DELETE CASCADE,
       encargado_id INT REFERENCES encargados(id) ON DELETE CASCADE,
@@ -76,6 +76,7 @@ const crearTablas = async () => {
       PRIMARY KEY (estudiante_id, encargado_id)
     );
 
+    -- TABLA DE MENSUALIDADES
     CREATE TABLE IF NOT EXISTS mensualidades_personalizadas (
       id SERIAL PRIMARY KEY,
       inscripcion_id INT NOT NULL REFERENCES inscripciones(id) ON DELETE CASCADE,
@@ -93,7 +94,7 @@ const crearTablas = async () => {
     -- TABLA GRUPOS_TARIFAS
     CREATE TABLE IF NOT EXISTS grupos_tarifas (
       id SERIAL PRIMARY KEY,
-      nombre VARCHAR(50) NOT NULL UNIQUE  -- Ej: 'Maternal', 'Inicial y Primaria', 'Secundaria'
+      nombre VARCHAR(50) NOT NULL UNIQUE
     );
 
     -- TABLA TARIFAS
@@ -114,7 +115,7 @@ const crearTablas = async () => {
       PRIMARY KEY (nombre_curso, sucursal)
     );
 
-    -- TABLA DE TARIFAS PERSONALIZADAS (Solo si el estudiante tiene un precio especial)
+    -- TABLA DE TARIFAS PERSONALIZADAS
     CREATE TABLE IF NOT EXISTS tarifas_personalizadas (
       id SERIAL PRIMARY KEY,
       inscripcion_id INT REFERENCES inscripciones(id) ON DELETE CASCADE,
@@ -122,20 +123,20 @@ const crearTablas = async () => {
       costo_mensualidad DECIMAL(10,2) NOT NULL
     );
 
-    -- TABLA DE PAGOS (Registra cada pago realizado por el estudiante)
+    -- TABLA DE PAGOS DE MENSUALIDADES
     CREATE TABLE IF NOT EXISTS pagos (
       id SERIAL PRIMARY KEY,
       inscripcion_id INT REFERENCES inscripciones(id) ON DELETE CASCADE,
-      concepto VARCHAR(50) NOT NULL,  -- Puede ser "Matrícula" o "Mensualidad (Mes)"
+      concepto VARCHAR(50) NOT NULL,
       monto_pagado DECIMAL(10,2) NOT NULL,
       fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      metodo_pago VARCHAR(50),  -- Opcional (Efectivo, Transferencia, etc.)
+      metodo_pago VARCHAR(50),
       observaciones TEXT,
       operador TEXT,
       sucursal VARCHAR(20) NOT NULL
     );
 
-    -- TABLA DE RECIBOS (Guarda los comprobantes de pago)
+    -- TABLA DE RECIBOS MENSUALIDADES
     CREATE TABLE IF NOT EXISTS recibos (
       id SERIAL PRIMARY KEY,
       pago_id INT REFERENCES pagos(id) ON DELETE CASCADE,
@@ -163,17 +164,17 @@ const crearTablas = async () => {
       id SERIAL PRIMARY KEY,
       id_personal INTEGER REFERENCES personal(id),
       tipo_personal VARCHAR(50) NOT NULL,
-      estado VARCHAR(10) DEFAULT 'activo'  -- 'activo' o 'inactivo'
+      estado VARCHAR(10) DEFAULT 'activo'
     );
 
-    -- TABLA DE CONTRATOS (anual, por tipo de personal)
+    -- TABLA DE CONTRATOS 
     CREATE TABLE IF NOT EXISTS contratos (
       id SERIAL PRIMARY KEY,
       id_personal INTEGER REFERENCES personal(id) ON DELETE CASCADE,
       id_historial_rol INTEGER REFERENCES historial_roles(id),
-      gestion INTEGER NOT NULL, -- Año (2023, 2024, etc.)
-      tipo_contrato VARCHAR(50), -- 'medio_tiempo', 'tiempo_completo' (NULL si es profesor)
-      id_turno INTEGER, -- NULL si tiempo completo o profesor
+      gestion INTEGER NOT NULL,
+      tipo_contrato VARCHAR(50),
+      id_turno INTEGER,
       sucursal VARCHAR(50) NOT NULL,
       sueldo_mensual NUMERIC(10, 2) NOT NULL,
       fecha_inicio DATE,
@@ -181,7 +182,7 @@ const crearTablas = async () => {
       observaciones TEXT
     );
 
-    -- TABLA DE TURNOS (para medio tiempo u otros)
+    -- TABLA DE TURNOS 
     CREATE TABLE IF NOT EXISTS turnos (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(50) NOT NULL,
@@ -204,7 +205,7 @@ const crearTablas = async () => {
     CREATE TABLE IF NOT EXISTS materias (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(100) NOT NULL,
-      nivel VARCHAR(20) NOT NULL, -- 'primaria' o 'secundaria'
+      nivel VARCHAR(20) NOT NULL,
       estado VARCHAR(10) NOT NULL DEFAULT 'activo'
     );
 
@@ -212,21 +213,21 @@ const crearTablas = async () => {
     CREATE TABLE IF NOT EXISTS cursos (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(50) NOT NULL,
-      nivel VARCHAR(20) NOT NULL -- 'primaria' o 'secundaria'
+      nivel VARCHAR(20) NOT NULL 
     );
 
-    -- TABLA DE HORARIOS PARA PROFESORES (asociado al contrato)
+    -- TABLA DE HORARIOS PARA PROFESORES
     CREATE TABLE IF NOT EXISTS horarios_profesor (
       id SERIAL PRIMARY KEY,
       id_contrato INTEGER REFERENCES contratos(id) ON DELETE CASCADE,
       id_materia INTEGER REFERENCES materias(id) ON DELETE SET NULL,
       id_curso INTEGER REFERENCES cursos(id) ON DELETE SET NULL,
-      dia_semana VARCHAR(20) NOT NULL, -- 'lunes', 'martes', etc.
+      dia_semana VARCHAR(20) NOT NULL,
       hora_inicio TIME NOT NULL,
       hora_fin TIME NOT NULL
     );
 
-    -- TABLA talleres
+    -- TABLA TALLERES
     CREATE TABLE IF NOT EXISTS talleres (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(100) NOT NULL,
@@ -235,7 +236,7 @@ const crearTablas = async () => {
       descripcion TEXT
     );
 
-    -- TABLA taller_fechas (ciclos del taller)
+    -- TABLA CICLOS DE TALLER
     CREATE TABLE IF NOT EXISTS taller_fechas (
       id SERIAL PRIMARY KEY,
       taller_id INT REFERENCES talleres(id) ON DELETE CASCADE,
@@ -246,7 +247,7 @@ const crearTablas = async () => {
       UNIQUE (taller_id, gestion, fecha_inicio, fecha_fin)
     );
 
-    -- TABLA taller_fechas_precios (precio por mes de un ciclo)
+    -- TABLA PRECIOS DE CICLOS
     CREATE TABLE IF NOT EXISTS taller_fechas_precios (
       id SERIAL PRIMARY KEY,
       taller_fecha_id INT REFERENCES taller_fechas(id) ON DELETE CASCADE,
@@ -255,7 +256,7 @@ const crearTablas = async () => {
       UNIQUE (taller_fecha_id, mes)
     );
 
-    -- TABLA taller_inscripciones (inscripciones de estudiantes al taller ciclo)
+    -- TABLA INSCRIPCIONES EN CICLOS
     CREATE TABLE IF NOT EXISTS taller_inscripciones (
       id SERIAL PRIMARY KEY,
       taller_fecha_id INT REFERENCES taller_fechas(id) ON DELETE CASCADE,
@@ -265,7 +266,7 @@ const crearTablas = async () => {
       UNIQUE (taller_fecha_id, estudiante_id)
     );
 
-    -- TABLA taller_pagos (pagos de los estudiantes por mes)
+    -- TABLA PAGOS DE TALLER
     CREATE TABLE IF NOT EXISTS taller_pagos (
       id SERIAL PRIMARY KEY,
       taller_inscripcion_id INT REFERENCES taller_inscripciones(id) ON DELETE CASCADE,
@@ -277,13 +278,14 @@ const crearTablas = async () => {
       operador TEXT
     );
 
-    -- TABLA Secciones de gastos
+    -- TABLA TIPO GASTOS
     CREATE TABLE IF NOT EXISTS secciones_gasto (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(100) UNIQUE NOT NULL,
       estado VARCHAR(20) DEFAULT 'activo'
     );
 
+    -- TABLA GASTOS
     CREATE TABLE IF NOT EXISTS gastos (
       id SERIAL PRIMARY KEY,
       id_usuario INTEGER,
@@ -300,45 +302,45 @@ const crearTablas = async () => {
         ON DELETE SET NULL
     );
 
-    -- Tipos de producto
+    -- TABLA TIPOS DE PRODUCTOS
     CREATE TABLE IF NOT EXISTS tipos_producto (
       id SERIAL PRIMARY KEY,
       nombre VARCHAR(50) NOT NULL,
       descripcion TEXT
     );
 
-    -- Productos
+    -- TABLA PRODUCTOS
     CREATE TABLE IF NOT EXISTS productos (
       id SERIAL PRIMARY KEY,
-      tipo VARCHAR(20) NOT NULL, -- 'uniforme' o 'libro'
+      tipo VARCHAR(20) NOT NULL,
       nombre VARCHAR(100) NOT NULL,
       descripcion TEXT,
-      curso VARCHAR(50), -- solo libros
-      sucursal VARCHAR(50), -- 'Primaria' o 'Secundaria', solo libros
-      materia_id INT REFERENCES materias(id) ON DELETE SET NULL, -- solo libros
-      talla VARCHAR(10), -- solo uniformes
-      precio NUMERIC(10,2) NOT NULL, -- 💡 nuevo: precio actual
+      curso VARCHAR(50), 
+      sucursal VARCHAR(50), 
+      materia_id INT REFERENCES materias(id) ON DELETE SET NULL, 
+      talla VARCHAR(10), 
+      precio NUMERIC(10,2) NOT NULL, 
       activo BOOLEAN DEFAULT TRUE
     );
 
-    -- Historial de precios
+    -- TABLA HISTORIAL PRECIOS DE PRODUCTOS
     CREATE TABLE IF NOT EXISTS historial_precios (
       id SERIAL PRIMARY KEY,
       producto_id INT REFERENCES productos(id) ON DELETE CASCADE,
       precio NUMERIC(10,2) NOT NULL,
       fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      operacion VARCHAR(20) DEFAULT 'cambio' -- 'creacion' o 'cambio'
+      operacion VARCHAR(20) DEFAULT 'cambio'
     );
 
-    -- Compras (cabecera)
+    -- TABLA COMPRAS
     CREATE TABLE IF NOT EXISTS compras (
       id SERIAL PRIMARY KEY,
       inscripcion_id INT REFERENCES inscripciones(id) ON DELETE CASCADE,
       fecha_compra DATE NOT NULL DEFAULT CURRENT_DATE,
-      estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente' -- Pendiente | Parcial | Pagado
+      estado VARCHAR(20) NOT NULL DEFAULT 'Pendiente'
     );
 
-    -- Detalles de productos comprados en una compra
+    -- TABLA DETALLE COMPRA
     CREATE TABLE IF NOT EXISTS compras_detalle (
       id SERIAL PRIMARY KEY,
       compra_id INT REFERENCES compras(id) ON DELETE CASCADE,
@@ -347,7 +349,7 @@ const crearTablas = async () => {
       precio_unitario NUMERIC(10,2) NOT NULL
     );
 
-    -- Pagos por compra
+    -- TABLA PAGOS COMPRA
     CREATE TABLE IF NOT EXISTS pagos_compra (
       id SERIAL PRIMARY KEY,
       compra_id INT REFERENCES compras(id) ON DELETE CASCADE,
