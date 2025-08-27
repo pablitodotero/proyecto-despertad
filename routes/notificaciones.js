@@ -34,7 +34,7 @@ router.post("/estado-usuario", async (req, res) => {
   const text = `${mensaje}\n\n${extra}`;
 
   try {
-    await sendEmail({ to: correo, subject: asunto, text, html });
+    await sendEmail({ to: [correo], subject: asunto, text, html });
     return res.json({ message: "Correo enviado correctamente." });
   } catch (error) {
     console.error("Error al enviar correo:", error);

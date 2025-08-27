@@ -13,33 +13,35 @@ function isValidEmail(email) {
 
 async function sendEmail({ to, subject, text, html, attachments = [] }) {
   try {
-    // Validar que 'to' sea un array de strings válidos
-    if (!Array.isArray(to) || to.length === 0) {
-      throw new Error("El campo 'to' debe ser un array con al menos un email.");
+    // Normalizar 'to' para que siempre sea un array
+    const normalizedTo = Array.isArray(to) ? to : [to];
+
+    // Validar que el array no esté vacío
+    if (normalizedTo.length === 0) {
+      throw new Error("El campo 'to' debe contener al menos un email.");
     }
 
-    const invalidEmails = to.filter(
+    // Validar cada email
+    const invalidEmails = normalizedTo.filter(
       (email) => typeof email !== "string" || !isValidEmail(email)
     );
     if (invalidEmails.length > 0) {
       throw new Error(`Email(s) inválido(s): ${invalidEmails.join(", ")}`);
     }
 
+    // Preparar adjuntos
     const brevoAttachments = attachments.map((attachment) => ({
       name: attachment.filename,
       content: attachment.content.toString("base64"),
     }));
 
+    // Configurar el correo
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
     sendSmtpEmail.sender = {
       name: "SIREDE",
       email: "pablo.crj.mss@gmail.com",
     };
-
-    // Convertir array de emails en array de objetos { email: string }
-    sendSmtpEmail.to = to.map((email) => ({ email }));
-
+    sendSmtpEmail.to = normalizedTo.map((email) => ({ email }));
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.textContent = text;
     sendSmtpEmail.htmlContent = html;
@@ -48,6 +50,7 @@ async function sendEmail({ to, subject, text, html, attachments = [] }) {
       sendSmtpEmail.attachment = brevoAttachments;
     }
 
+    // Enviar
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log("Correo enviado con Brevo. Message ID: ", data.messageId);
     return data;
