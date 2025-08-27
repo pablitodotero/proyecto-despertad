@@ -13,13 +13,16 @@ function isValidEmail(email) {
 
 async function sendEmail({ to, subject, text, html, attachments = [] }) {
   try {
-    // Validar que 'to' sea un email válido
-    if (!to || typeof to !== "string") {
-      throw new Error("Email destinatario es requerido y debe ser un string");
+    // Validar que 'to' sea un array de strings válidos
+    if (!Array.isArray(to) || to.length === 0) {
+      throw new Error("El campo 'to' debe ser un array con al menos un email.");
     }
 
-    if (!isValidEmail(to)) {
-      throw new Error(`Email inválido: ${to}`);
+    const invalidEmails = to.filter(
+      (email) => typeof email !== "string" || !isValidEmail(email)
+    );
+    if (invalidEmails.length > 0) {
+      throw new Error(`Email(s) inválido(s): ${invalidEmails.join(", ")}`);
     }
 
     const brevoAttachments = attachments.map((attachment) => ({
@@ -34,7 +37,9 @@ async function sendEmail({ to, subject, text, html, attachments = [] }) {
       email: "pablo.crj.mss@gmail.com",
     };
 
-    sendSmtpEmail.to = [{ email: to }];
+    // Convertir array de emails en array de objetos { email: string }
+    sendSmtpEmail.to = to.map((email) => ({ email }));
+
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.textContent = text;
     sendSmtpEmail.htmlContent = html;
