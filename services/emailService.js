@@ -1,9 +1,9 @@
 //BREVO CHATGPT
-const SibApiV3Sdk = require('sib-api-v3-sdk');
-require('dotenv').config();
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+require("dotenv").config();
 
 const client = SibApiV3Sdk.ApiClient.instance;
-client.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
 async function sendEmail(to, subject, htmlContent) {
   try {
@@ -16,12 +16,14 @@ async function sendEmail(to, subject, htmlContent) {
     sendSmtpEmail.htmlContent = htmlContent;
 
     await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('Correo enviado con Brevo');
+    console.log("Correo enviado con Brevo");
     return true;
   } catch (error) {
-    console.error('Error al enviar correo con Brevo:', error);
+    console.error("Error al enviar correo con Brevo:", error);
     throw error;
   }
 }
 
-module.exports = { sendEmail };
+module.exports = {
+  sendEmail,
+};
