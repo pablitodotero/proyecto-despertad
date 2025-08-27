@@ -1,24 +1,21 @@
-const SibApiV3Sdk = require("sib-api-v3-sdk");
+const { Resend } = require("resend");
 require("dotenv").config();
 
-const client = SibApiV3Sdk.ApiClient.instance;
-client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendEmail(to, subject, htmlContent) {
   try {
-    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    const data = await resend.emails.send({
+      from: process.env.RESEND_FROM,
+      to,
+      subject,
+      html: htmlContent,
+    });
 
-    sendSmtpEmail.sender = { email: process.env.BREVO_FROM };
-    sendSmtpEmail.to = [{ email: to }];
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.htmlContent = htmlContent;
-
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log("Correo enviado con Brevo");
+    console.log("Correo enviado con Resend:", data);
     return true;
   } catch (error) {
-    console.error("Error al enviar correo con Brevo:", error);
+    console.error("Error al enviar correo con Resend:", error);
     throw error;
   }
 }
