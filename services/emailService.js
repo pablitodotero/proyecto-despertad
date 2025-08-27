@@ -1,4 +1,5 @@
 const SibApiV3Sdk = require("sib-api-v3-sdk");
+require('dotenv').config();
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications["api-key"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
@@ -39,7 +40,7 @@ async function sendEmail({ to, subject, text, html, attachments = [] }) {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.sender = {
       name: "SIREDE",
-      email: "pablo.crj.mss@gmail.com",
+      email: process.env.BREVO_FROM,
     };
     sendSmtpEmail.to = normalizedTo.map((email) => ({ email }));
     sendSmtpEmail.subject = subject;
