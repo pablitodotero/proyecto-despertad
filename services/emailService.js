@@ -1,31 +1,45 @@
-const brevo = require('@getbrevo/brevo');
+// emailServiceBrevo.js
+require("dotenv").config();
+const brevo = require("@getbrevo/brevo");
+
+// Configuración del cliente Brevo
 const defaultClient = brevo.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = process.env.BREVO_API_KEY; 
+const apiKey = defaultClient.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
 const apiInstance = new brevo.TransactionalEmailsApi();
 
+/**
+ * Enviar correo con Brevo
+ * @param {Object} options
+ * @param {string} options.to - Correo destino
+ * @param {string} options.subject - Asunto del correo
+ * @param {string} options.text - Texto plano
+ * @param {string} options.html - HTML del correo
+ * @param {Array} options.attachments - Archivos adjuntos [{ filename, content }]
+ */
 async function sendEmail({ to, subject, text, html, attachments = [] }) {
   try {
-    // Brevo espera un array de objetos para destinatarios
     const sendSmtpEmail = new brevo.SendSmtpEmail({
       sender: { name: "SIREDE", email: "pablo.crj.mss@gmail.com" },
       to: [{ email: to }],
-      subject: subject,
+      subject,
       textContent: text,
       htmlContent: html,
-      // Para adjuntos, Brevo necesita un formato específico
-      attachment: attachments.map(attachment => ({
+      attachment: attachments.map((attachment) => ({
         name: attachment.filename,
-        content: attachment.content.toString('base64')
-      }))
+        content: attachment.content.toString("base64"),
+      })),
     });
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('Correo enviado con Brevo. Message ID: ', data.messageId);
+    console.log("✅ Correo enviado con Brevo. Message ID:", data.messageId);
     return data;
   } catch (error) {
-    console.error('Error al enviar correo con Brevo:', error);
+    console.error(
+      "❌ Error al enviar correo con Brevo:",
+      error.response?.body || error.message
+    );
     throw error;
   }
 }
