@@ -1,20 +1,18 @@
-const brevo = require("@getbrevo/brevo");
-const defaultClient = brevo.ApiClient.instance;
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const apiKey = defaultClient.authentications["api-key"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
 
-const apiInstance = new brevo.TransactionalEmailsApi();
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 async function sendEmail({ to, subject, text, html, attachments = [] }) {
   try {
-    // Brevo espera un array de objetos para destinatarios
-    const sendSmtpEmail = new brevo.SendSmtpEmail({
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail({
       sender: { name: "SIREDE", email: "pablo.crj.mss@gmail.com" },
       to: [{ email: to }],
       subject: subject,
       textContent: text,
       htmlContent: html,
-      // Para adjuntos, Brevo necesita un formato específico
       attachment: attachments.map((attachment) => ({
         name: attachment.filename,
         content: attachment.content.toString("base64"),
