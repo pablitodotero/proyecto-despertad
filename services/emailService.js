@@ -23,7 +23,7 @@ async function sendEmail({ to, subject, text, html, attachments = [] }) {
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.sender = {
       name: "SIREDE",
-      email: "no-reply@gmail.com", // DEBE estar verificado en Brevo
+      email: "pablo.crj.mss@gmail.com", // DEBE estar verificado en Brevo
     };
     sendSmtpEmail.to = sendTo;
     sendSmtpEmail.subject = subject;
