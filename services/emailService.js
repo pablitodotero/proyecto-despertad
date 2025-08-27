@@ -3,13 +3,14 @@ require("dotenv").config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-async function sendEmail(to, subject, htmlContent) {
+async function sendEmail(to, subject, htmlContent, attachments) {
   try {
     const data = await resend.emails.send({
       from: process.env.RESEND_FROM,
       to,
       subject,
       html: htmlContent,
+      attachments, 
     });
 
     console.log("Correo enviado con Resend:", data);
