@@ -117,7 +117,7 @@ router.post("/enviar-recibo", async (req, res) => {
     )}\nAdjunto encontrará su recibo.`;
 
     await sendEmail({
-      to: destinatarios,
+      to: destinatarios.join(", "),
       subject: "Recibo de pago - SIREDE",
       text,
       html,
