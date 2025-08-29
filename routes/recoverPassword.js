@@ -41,7 +41,7 @@ router.post("/forgot", async (req, res) => {
     if (result.rows.length === 0) {
       return res
         .status(404)
-        .json({ message: "No se encontró usuario con ese correo/nickname." });
+        .json({ message: "No se encontró usuario con ese correo/nickname. Si el problema persiste, vuelva a iniciar sesión" });
     }
     const usuario = result.rows[0];
 
