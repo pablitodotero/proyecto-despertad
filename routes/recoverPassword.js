@@ -39,9 +39,10 @@ router.post("/forgot", async (req, res) => {
     `;
     const result = await pool.query(queryUser, [loginOrEmail.toLowerCase()]);
     if (result.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No se encontró usuario con ese correo/nickname. Si el problema persiste, vuelva a iniciar sesión" });
+      return res.status(404).json({
+        message:
+          "No se encontró usuario con ese correo/nickname. Vuelve a iniciar sesión o prueba recuperar contraseña desde la opción del login.",
+      });
     }
     const usuario = result.rows[0];
 

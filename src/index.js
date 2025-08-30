@@ -45,12 +45,13 @@ const dashboard = require("../routes/dashboard");
 const tesoreria = require("../routes/tesoreria");
 const creacion = require("../routes/creacion");
 const especial = require("../routes/especial");
+const verificarUsuario = require("../routes/verificarUsuario");
 
 const app = express();
 app.use(
   cors({
     origin: [
-      "http://localhost:4200",
+      //"http://localhost:4200",
       "https://proyecto-despertad-production.up.railway.app",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -108,6 +109,7 @@ app.use("/api/dashboard", dashboard);
 app.use("/api/tesoreria", tesoreria);
 app.use("/api/creacion", creacion);
 app.use("/api/especial", especial);
+app.use("/api/verificarUsuario", verificarUsuario);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
